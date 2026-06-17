@@ -58,9 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Restaurar Tema Salvo
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.remove('dark-theme');
-        document.body.classList.add('light-theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.remove('light-theme');
+        document.body.classList.add('dark-theme');
     }
 
     // 2. Expandir/Colapsar Configurações de API
