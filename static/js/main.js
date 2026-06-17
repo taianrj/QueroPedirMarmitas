@@ -154,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     objetivoSelect.value = criterios.objetivo;
                     if (criterios.objetivo === 'Outro') {
                         customObjetivoGroup.classList.remove('hidden');
+                        customObjetivoInput.required = true;
                         if (criterios.customObjetivo) customObjetivoInput.value = criterios.customObjetivo;
                     }
                 }
@@ -223,9 +224,12 @@ document.addEventListener('DOMContentLoaded', () => {
     objetivoSelect.addEventListener('change', () => {
         if (objetivoSelect.value === 'Outro') {
             customObjetivoGroup.classList.remove('hidden');
+            customObjetivoInput.required = true;
             customObjetivoInput.focus();
         } else {
             customObjetivoGroup.classList.add('hidden');
+            customObjetivoInput.required = false;
+            customObjetivoInput.value = '';
         }
         salvarCriterios();
     });
@@ -369,7 +373,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Determinar objetivo nutricional final
         let objetivoFinal = objetivoSelect.value;
         if (objetivoFinal === 'Outro') {
-            objetivoFinal = customObjetivoInput.value.trim() || 'Saudável / Variado';
+            const textoObj = customObjetivoInput.value.trim();
+            if (!textoObj) {
+                mostrarAlertaFlutuante('Por favor, especifique o seu objetivo nutricional!', 'aviso');
+                customObjetivoInput.focus();
+                return;
+            }
+            objetivoFinal = textoObj;
         }
 
         const quantidade = parseInt(quantidadeInput.value);
