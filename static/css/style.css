@@ -427,6 +427,35 @@ label {
     align-items: center;
 }
 
+.input-group {
+    display: flex;
+    gap: 0.8rem;
+    align-items: stretch;
+}
+
+.input-group .input-wrapper {
+    flex-grow: 1;
+}
+
+@media (max-width: 580px) {
+    .input-group {
+        flex-direction: column;
+    }
+}
+
+.input-icon {
+    position: absolute;
+    left: 1.1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    z-index: 2;
+    pointer-events: none;
+}
+
+#geminiApiKey {
+    padding-left: 2.6rem;
+}
+
 .input-wrapper input {
     width: 100%;
     background-color: var(--input-bg);
