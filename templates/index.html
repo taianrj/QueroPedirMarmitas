@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quero Pedir Marmitas - Assistente Inteligente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="dark-theme">
+    <div class="glass-bg-elements">
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i class="fa-solid fa-utensils logo-icon"></i>
+                <div>
+                    <h1>Quero Pedir Marmitas</h1>
+                    <p class="subtitle">Seu Assistente Nutricional Inteligente</p>
+                </div>
+            </div>
+            <div class="theme-toggle" id="themeToggleBtn">
+                <i class="fa-solid fa-sun icon-sun"></i>
+                <i class="fa-solid fa-moon icon-moon"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <!-- Seção de Chave da API do Gemini -->
+        <section class="config-section glass-panel">
+            <div class="config-header" id="configHeader">
+                <div class="config-title">
+                    <i class="fa-solid fa-key"></i>
+                    <h2>Configuração da API do Gemini</h2>
+                </div>
+                <div class="config-status-badge" id="apiStatusBadge">
+                    <span class="status-dot red"></span>
+                    <span class="status-text">Não configurada</span>
+                </div>
+                <i class="fa-solid fa-chevron-down config-chevron" id="configChevron"></i>
+            </div>
+            
+            <div class="config-body collapsed" id="configBody">
+                <p class="config-info">
+                    Sua chave de API do Gemini é salva localmente apenas no seu navegador (localStorage) e é enviada com segurança para as chamadas de IA.
+                </p>
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="geminiApiKey" placeholder="Cole sua chave API do Gemini aqui (AIzaSy...)">
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-primary" id="btnSaveApiKey">
+                        <i class="fa-solid fa-floppy-disk"></i> Salvar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid-two-columns">
+            <!-- Painel de Critérios -->
+            <section class="criteria-panel glass-panel">
+                <div class="panel-header">
+                    <i class="fa-solid fa-sliders-h"></i>
+                    <h2>Seus Critérios de Pedido</h2>
+                </div>
+
+                <form id="criteriaForm" class="criteria-form">
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="quantidade">Quantidade de Marmitas</label>
+                            <div class="number-input-wrapper">
+                                <button type="button" class="num-btn num-minus" id="qtyMinus">-</button>
+                                <input type="number" id="quantidade" value="20" min="20" max="100" step="1">
+                                <button type="button" class="num-btn num-plus" id="qtyPlus">+</button>
+                            </div>
+                            <span class="field-help">Mínimo de 20 marmitas para o Combo.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maxRepeticoes">Máx. Repetições por Marmita</label>
+                            <div class="number-input-wrapper">
+                                <button type="button" class="num-btn num-minus" id="repMinus">-</button>
+                                <input type="number" id="maxRepeticoes" value="3" min="1" max="10" step="1">
+                                <button type="button" class="num-btn num-plus" id="repPlus">+</button>
+                            </div>
+                            <span class="field-help">Evita escolher muitos pratos iguais (ex: máx. 3 de cada).</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="objetivo">Objetivo Nutricional</label>
+                            <div class="select-wrapper">
+                                <select id="objetivo">
+                                    <option value="Equilibrado / Variado" selected>Equilibrado / Variado (Saudável)</option>
+                                    <option value="Emagrecimento / Definição Muscular (Menos calorias)">Emagrecimento / Definição Muscular</option>
+                                    <option value="Ganho de Massa / Hipertrofia (Mais proteínas e carboidratos complexos)">Ganho de Massa / Hipertrofia</option>
+                                    <option value="Low Carb (Foco em vegetais e proteínas, baixo carbo)">Low Carb</option>
+                                    <option value="Vegetariano (Sem nenhum tipo de carne)">Vegetariano</option>
+                                    <option value="Outro">Outro (Digitar abaixo)</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down select-chevron"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="valorMaximo">Valor Máximo Aproximado</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">R$</span>
+                                <input type="number" id="valorMaximo" placeholder="Opcional (ex: 600)" min="1">
+                            </div>
+                            <span class="field-help">A IA tentará não ultrapassar este valor.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group hidden" id="customObjetivoGroup">
+                        <label for="customObjetivo">Especifique seu Objetivo</label>
+                        <input type="text" id="customObjetivo" placeholder="Ex: Dieta cetogênica, Alto teor de fibras, etc.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exclusoes">Exclusões / Alergias / Ingredientes Indesejados</label>
+                        <div class="textarea-wrapper">
+                            <i class="fa-solid fa-ban field-icon"></i>
+                            <input type="text" id="exclusoes" placeholder="Ex: sem carne vermelha, sem peixe, sem purê de abóbora, etc.">
+                        </div>
+                        <span class="field-help">A IA removerá do cardápio pratos que contenham estes termos.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="preferencias">Preferências / Pratos favoritos</label>
+                        <div class="textarea-wrapper">
+                            <i class="fa-solid fa-heart field-icon text-red"></i>
+                            <input type="text" id="preferencias" placeholder="Ex: prefira frango, gosto de arroz integral, selecione mais massas...">
+                        </div>
+                        <span class="field-help">A IA dará maior prioridade para pratos alinhados com suas preferências.</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-action btn-pulse" id="btnGerarSugestao">
+                        <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles"></i> Escolher Marmitas com IA</span>
+                        <span class="btn-loader hidden"><i class="fa-solid fa-circle-notch fa-spin"></i> Montando o combo perfeito...</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Cardápio e Status -->
+            <section class="menu-panel glass-panel">
+                <div class="panel-header header-with-badge">
+                    <div class="title-with-icon">
+                        <i class="fa-solid fa-file-invoice"></i>
+                        <h2>Cardápio do Delivery</h2>
+                    </div>
+                    <span class="source-badge loading" id="sourceBadge">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Carregando
+                    </span>
+                </div>
+
+                <div class="menu-search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="menuSearch" placeholder="Pesquisar pratos no cardápio...">
+                </div>
+
+                <div class="menu-list-container">
+                    <div class="loading-state" id="menuLoadingState">
+                        <i class="fa-solid fa-circle-notch fa-spin loader-icon"></i>
+                        <p>Buscando pratos saudáveis em tempo real...</p>
+                    </div>
+                    
+                    <div class="error-state hidden" id="menuErrorState">
+                        <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+                        <p id="menuErrorMessage">Erro ao carregar o cardápio.</p>
+                        <button class="btn btn-secondary btn-sm" id="btnRetryLoadMenu">
+                            <i class="fa-solid fa-rotate-right"></i> Tentar Novamente
+                        </button>
+                    </div>
+
+                    <div class="menu-stats hidden" id="menuStats">
+                        <span id="menuTotalCount">0 pratos encontrados</span>
+                    </div>
+
+                    <ul class="menu-list hidden" id="menuList">
+                        <!-- Itens do cardápio inseridos dinamicamente -->
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- Seção de Resultados (Oculta inicialmente, animada ao mostrar) -->
+        <section class="result-section glass-panel hidden" id="resultSection">
+            <div class="panel-header text-center-mobile">
+                <i class="fa-solid fa-clipboard-check text-green"></i>
+                <h2>Sua Combinação de Marmitas Sugerida</h2>
+            </div>
+
+            <div class="result-grid">
+                <!-- Análise Nutricional e Seleção -->
+                <div class="result-details-col">
+                    <div class="justification-card">
+                        <h3><i class="fa-solid fa-circle-info text-blue"></i> Análise Nutricional</h3>
+                        <p id="justificativaNutricional">
+                            Carregando justificativa da IA...
+                        </p>
+                    </div>
+
+                    <div class="selection-table-card">
+                        <h3><i class="fa-solid fa-list-ol"></i> Pratos Selecionados</h3>
+                        <div class="table-container">
+                            <table class="selection-table">
+                                <thead>
+                                    <tr>
+                                        <th>Marmita</th>
+                                        <th class="text-center">Qtd</th>
+                                        <th class="text-right">Unitário</th>
+                                        <th class="text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="selectedItemsBody">
+                                    <!-- Inserido dinamicamente -->
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-right font-bold">Total do Combo:</td>
+                                        <td class="text-right font-bold text-green" id="comboTotalValue">R$ 0,00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensagem Pronta -->
+                <div class="result-message-col">
+                    <div class="message-card">
+                        <div class="message-card-header">
+                            <h3><i class="fa-solid fa-comment-dots text-green"></i> Mensagem para o Pedido</h3>
+                            <span class="copy-tooltip" id="copyTooltip">Copiado!</span>
+                        </div>
+                        <p class="message-info">
+                            Esta mensagem está no formato ideal aceito pela Lulu. Copie e envie para fechar seu pedido!
+                        </p>
+                        <div class="textarea-container">
+                            <textarea id="whatsappMessage" readonly></textarea>
+                        </div>
+                        <div class="message-actions">
+                            <button class="btn btn-secondary btn-full" id="btnCopyMessage">
+                                <i class="fa-solid fa-copy"></i> Copiar Mensagem
+                            </button>
+                            <a href="#" target="_blank" class="btn btn-whatsapp btn-full text-center" id="btnSendWhatsapp">
+                                <i class="fa-brands fa-whatsapp"></i> Enviar pelo WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>© 2026 Quero Pedir Marmitas - Desenvolvido para agilizar sua nutrição diária.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
