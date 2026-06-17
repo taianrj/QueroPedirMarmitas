@@ -273,8 +273,8 @@ FORMATO DE RETORNO ESPERADO (Gere APENAS um JSON no formato especificado abaixo,
 """
 
         # Chamar o modelo Gemini 2.5 Flash
-        # O modelo recomendado para tarefas rápidas e estruturadas é 'gemini-2.5-flash'
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        # O modelo recomendado para tarefas rápidas e estruturadas é 'gemini-3.5-flash'
+        model = genai.GenerativeModel('gemini-3.5-flash')
         
         response = model.generate_content(
             prompt,
