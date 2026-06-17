@@ -1,4 +1,4 @@
-# QueroPedirMarmitas 🍲🤖
+# QueroPedirMarmitas 🍽️
 
 Um assistente web local e inteligente projetado para automatizar e otimizar o pedido de combos de refeições saudáveis. O sistema lê as marmitas disponíveis em tempo real diretamente do cardápio do site de delivery, aplica seus critérios nutricionais/financeiros personalizados e utiliza a **API do Gemini (Google AI)** para escolher a melhor combinação de pratos, gerando uma mensagem perfeitamente formatada pronta para enviar ao WhatsApp de atendimento.
 
