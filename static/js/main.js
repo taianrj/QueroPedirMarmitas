@@ -432,7 +432,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error(error);
-            mostrarAlertaFlutuante(`Erro: ${error.message}`, 'erro');
+            const msgErro = error.message;
+            if (msgErro.includes('429') || msgErro.toLowerCase().includes('quota') || msgErro.toLowerCase().includes('rate limit')) {
+                mostrarAlertaFlutuante('Limite de requisições do Gemini atingido (máx. 5 por minuto na chave gratuita). Aguarde 30 segundos e tente novamente!', 'aviso');
+            } else {
+                mostrarAlertaFlutuante(`Erro: ${msgErro}`, 'erro');
+            }
         } finally {
             // Reverter estado do botão
             btnGerarSugestao.disabled = false;
