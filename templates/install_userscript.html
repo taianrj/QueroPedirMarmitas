@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instalar Automacao do Carrinho</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .install-container {
+            max-width: 980px;
+        }
+
+        .install-steps {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .install-step {
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            gap: 0.85rem;
+            align-items: start;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.55;
+        }
+
+        .install-step-number {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .script-textarea {
+            width: 100%;
+            min-height: 420px;
+            resize: vertical;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--input-border);
+            background: rgba(0, 0, 0, 0.24);
+            color: var(--text-primary);
+            padding: 1rem;
+            font: 0.82rem/1.45 Consolas, "Courier New", monospace;
+        }
+
+        .script-textarea:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .install-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1rem 0 1.4rem;
+        }
+
+        .install-note {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 620px) {
+            .install-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <main class="app-container install-container">
+        <section class="glass-panel">
+            <div class="panel-header">
+                <i class="fa-solid fa-puzzle-piece"></i>
+                <h1>Automacao do Carrinho</h1>
+            </div>
+
+            <div class="install-steps">
+                <div class="install-step">
+                    <span class="install-step-number">1</span>
+                    <p>Instale uma extensao de userscript no Chrome, como Tampermonkey ou Violentmonkey, pela Chrome Web Store.</p>
+                </div>
+                <div class="install-step">
+                    <span class="install-step-number">2</span>
+                    <p>Abra o painel da extensao, crie um novo script ou edite o script existente, apague todo o conteudo e cole a versao abaixo.</p>
+                </div>
+                <div class="install-step">
+                    <span class="install-step-number">3</span>
+                    <p>Salve o script. Depois volte ao QueroPedirMarmitas e use o botao Montar Carrinho no Site. Ao funcionar, uma caixa de status aparece no site da Marmitas da Lulu antes de abrir o carrinho.</p>
+                </div>
+            </div>
+
+            <div class="install-actions">
+                <a class="btn btn-primary" href="https://chromewebstore.google.com/search/Tampermonkey" target="_blank" rel="noopener">
+                    <i class="fa-solid fa-store"></i> Abrir Chrome Web Store
+                </a>
+                <button class="btn btn-secondary" type="button" id="copyScriptBtn">
+                    <i class="fa-solid fa-copy"></i> Copiar Script
+                </button>
+                <a class="btn btn-secondary" href="{{ url_for('static', filename='js/lulu-cart.user.js') }}" target="_blank">
+                    <i class="fa-solid fa-code"></i> Ver Arquivo Cru
+                </a>
+            </div>
+
+            <textarea class="script-textarea" id="scriptContent" spellcheck="false" readonly>{{ script_content }}</textarea>
+
+            <p class="install-note">
+                O erro do Chrome aparece porque o navegador bloqueia a instalacao direta de apps, extensoes e scripts a partir de sites locais como localhost. Instalando pelo painel do Tampermonkey, o script fica no seu navegador e roda somente no site da Marmitas da Lulu. Se a caixa de status nao aparecer no site, confirme no Tampermonkey se o script esta ativo e se o cabecalho mostra `@version      1.2.0`.
+            </p>
+        </section>
+    </main>
+
+    <script>
+        const copyButton = document.getElementById('copyScriptBtn');
+        const scriptContent = document.getElementById('scriptContent');
+
+        copyButton.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(scriptContent.value);
+            } catch (error) {
+                scriptContent.focus();
+                scriptContent.select();
+                document.execCommand('copy');
+            }
+
+            copyButton.innerHTML = '<i class="fa-solid fa-check"></i> Copiado';
+            setTimeout(() => {
+                copyButton.innerHTML = '<i class="fa-solid fa-copy"></i> Copiar Script';
+            }, 1800);
+        });
+    </script>
+</body>
+</html>

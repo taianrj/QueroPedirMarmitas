@@ -7,11 +7,14 @@ Um assistente web local e inteligente projetado para automatizar e otimizar o pe
 ## ✨ Recursos
 
 - **Raspagem em Tempo Real (Web Scraping)**: Conecta-se diretamente ao site de delivery para obter os pratos atuais, ingredientes e preços em milissegundos, sem a lentidão de navegadores headless.
+- **Seleção Dinâmica de Combo**: Busca automaticamente no site os combos disponíveis, exibe o preço "A partir de R$..." de cada um e ajusta cardápio, quantidade mínima e automação do carrinho.
 - **Mecanismo de Resiliência (Excel Fallback)**: Caso o site mude de estrutura ou esteja fora do ar, o sistema lê os pratos automaticamente a partir do arquivo Excel local no diretório do projeto.
 - **Persistência de Preferências**: Suas escolhas (objetivo, quantidade de marmitas, restrições e chave de API) ficam salvas de forma segura no navegador (*localStorage*), eliminando a necessidade de redigitá-las.
 - **Escolha Inteligente Limitada**: Permite definir um limite máximo de repetições por prato (ex: no máximo 3 unidades de cada marmita) para garantir diversidade na sua alimentação semanal.
+- **Escolha Local sem IA**: Monta uma sugestão no próprio navegador usando heurísticas por objetivo, preferências, exclusões, orçamento e limite de repetição, sem consumir tokens da API.
 - **Saudação Dinâmica por Horário**: Ajusta a saudação automaticamente com base na hora do dia ("Bom dia!", "Boa tarde!" ou "Boa noite! Tudo bem?").
 - **Geração e Cópia Simplificada**: Remove os preços do texto a ser enviado no WhatsApp (para que o atendimento confirme os valores oficialmente) e oferece atalhos para copiar e enviar a mensagem diretamente.
+- **Montagem Assistida do Carrinho**: Gera um link para abrir o combo escolhido no site da Marmitas da Lulu com os itens selecionados e, com o userscript instalado, montar o carrinho para revisão manual.
 - **Interface Premium**: Design moderno com suporte a temas Escuro/Claro, efeitos de vidro translúcido (*glassmorphism*) e fotos reais das marmitas integradas ao cardápio com fallback robusto.
 
 ---
@@ -67,3 +70,13 @@ O servidor agora rodará de forma invisível. Você pode adicionar a página `ht
 ## 🔐 Configuração da API Key
 Para utilizar o sistema, você precisará de uma chave de API do Gemini, que pode ser obtida gratuitamente no **[Google AI Studio](https://aistudio.google.com/)**.
 A chave é salva localmente e de forma segura apenas no armazenamento interno do seu próprio navegador (*localStorage*).
+
+---
+
+## 🛒 Montagem do Carrinho no Site
+
+O botão **Guia da Automacao do Carrinho** abre uma página local com instruções e o conteúdo do arquivo `static/js/lulu-cart.user.js`, que deve ser instalado em uma extensão de userscript como Tampermonkey ou Violentmonkey.
+
+O Chrome bloqueia a instalação direta de scripts a partir do `localhost`, então copie o script pela página de guia, crie um novo script no painel do Tampermonkey/Violentmonkey e cole o conteúdo lá.
+
+Depois de gerar uma sugestão com a IA ou com **Escolher marmitas sem IA**, use **Montar Carrinho no Site**. O app abre a página do combo com um payload curto na URL; o userscript roda dentro do site da Marmitas da Lulu, adiciona as opções ao carrinho da PrefiroDelivery e leva você para revisar o pedido. Ele não finaliza compra, não envia pedido e não preenche pagamento automaticamente.

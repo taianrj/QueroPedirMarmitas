@@ -76,6 +76,30 @@
                 </div>
 
                 <form id="criteriaForm" class="criteria-form">
+                    <div class="form-group combo-select-group">
+                        <label for="comboSelect">Combo do Delivery</label>
+                        <div class="select-wrapper">
+                            <select id="comboSelect">
+                                {% for combo in combos %}
+                                <option
+                                    value="{{ combo.id }}"
+                                    data-nome="{{ combo.nome }}"
+                                    data-rotulo="{{ combo.rotulo }}"
+                                    data-url="{{ combo.url }}"
+                                    data-min="{{ combo.min_quantidade }}"
+                                    data-default="{{ combo.quantidade_padrao }}"
+                                    data-max="{{ combo.max_quantidade }}"
+                                    data-preco-a-partir="{{ combo.preco_a_partir or '' }}"
+                                    data-preco-a-partir-texto="{{ combo.preco_a_partir_texto or '' }}"
+                                    {% if combo.id|string == default_combo_id %}selected{% endif %}
+                                >{{ combo.rotulo }}{% if combo.preco_a_partir_texto %} - {{ combo.preco_a_partir_texto }}{% endif %}</option>
+                                {% endfor %}
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-chevron"></i>
+                        </div>
+                        <span class="field-help" id="comboHelp">Por padrão, o app usa o combo de 20 marmitas.</span>
+                    </div>
+
                     <div class="form-group-row">
                         <div class="form-group">
                             <label for="quantidade">Quantidade de Marmitas</label>
@@ -84,7 +108,7 @@
                                 <input type="number" id="quantidade" value="20" min="20" max="100" step="1">
                                 <button type="button" class="num-btn num-plus" id="qtyPlus">+</button>
                             </div>
-                            <span class="field-help">Mínimo de 20 marmitas para o Combo.</span>
+                            <span class="field-help" id="quantidadeHelp">Mínimo de 20 marmitas para o Combo.</span>
                         </div>
 
                         <div class="form-group">
@@ -153,6 +177,11 @@
                         <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles"></i> Escolher Marmitas com IA</span>
                         <span class="btn-loader hidden"><i class="fa-solid fa-circle-notch fa-spin"></i> Montando o combo perfeito...</span>
                     </button>
+
+                    <button type="button" class="btn btn-local btn-full" id="btnGerarSugestaoLocal">
+                        <i class="fa-solid fa-bolt"></i> Escolher marmitas sem IA
+                    </button>
+
                 </form>
             </section>
 
@@ -261,6 +290,12 @@
                             <a href="#" target="_blank" class="btn btn-whatsapp btn-full text-center" id="btnSendWhatsapp">
                                 <i class="fa-brands fa-whatsapp"></i> Enviar pelo WhatsApp
                             </a>
+                            <a href="{{ url_for('instalar_automacao_carrinho') }}" target="_blank" class="btn btn-secondary btn-full text-center" id="btnInstallCartScript">
+                                <i class="fa-solid fa-puzzle-piece"></i> Guia da Automacao do Carrinho
+                            </a>
+                            <a href="#" class="btn btn-cart btn-full text-center is-disabled" id="btnOpenCartAutomation" aria-disabled="true">
+                                <i class="fa-solid fa-cart-plus"></i> Montar Carrinho no Site
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -271,6 +306,17 @@
     <footer class="app-footer">
         <p>© 2026 Quero Pedir Marmitas - Desenvolvido para agilizar sua nutrição diária.</p>
     </footer>
+
+    <div class="photo-modal hidden" id="photoModal" role="dialog" aria-modal="true" aria-labelledby="photoModalTitle">
+        <div class="photo-modal-backdrop" id="photoModalBackdrop"></div>
+        <div class="photo-modal-content">
+            <button type="button" class="photo-modal-close" id="photoModalClose" aria-label="Fechar foto ampliada">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img src="" alt="" class="photo-modal-img" id="photoModalImg">
+            <div class="photo-modal-caption" id="photoModalTitle"></div>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

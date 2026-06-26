@@ -693,6 +693,22 @@ label {
     box-shadow: none;
 }
 
+.btn-local {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    border: 1px solid var(--input-border);
+    font-size: 0.98rem;
+    font-weight: 700;
+    padding: 0.95rem 1.5rem;
+}
+
+.btn-local:hover {
+    background-color: rgba(255, 255, 255, 0.11);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 14px var(--accent-glow);
+    transform: translateY(-1px);
+}
+
 .btn-full {
     width: 100%;
 }
@@ -712,6 +728,26 @@ label {
     background-color: hsl(142, 75%, 36%);
     box-shadow: 0 0 15px rgba(37, 211, 102, 0.3);
     transform: translateY(-1px);
+}
+
+.btn-cart {
+    background-color: hsl(210, 72%, 44%);
+    color: white;
+}
+
+.btn-cart:hover {
+    background-color: hsl(210, 76%, 38%);
+    box-shadow: 0 0 15px rgba(45, 130, 220, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn.is-disabled,
+.btn[aria-disabled="true"] {
+    opacity: 0.52;
+    cursor: not-allowed;
+    pointer-events: auto;
+    box-shadow: none;
+    transform: none;
 }
 
 /* Efeito Pulsação */
@@ -853,6 +889,59 @@ label {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
+.menu-item-img-button {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    cursor: zoom-in;
+    flex-shrink: 0;
+}
+
+.menu-item-img-button::after {
+    content: "\f00e";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    font-size: 0.62rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+    opacity: 0;
+    transform: scale(0.86);
+    transition: var(--transition);
+}
+
+.menu-item-img-button:hover::after,
+.menu-item-img-button:focus-visible::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.menu-item-img-button:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 3px;
+}
+
+.menu-item-img-button:disabled {
+    cursor: default;
+}
+
+.menu-item-img-button:disabled::after {
+    display: none;
+}
+
 .menu-item-img-placeholder {
     width: 50px;
     height: 50px;
@@ -898,6 +987,25 @@ label {
     border: 1px solid rgba(124, 204, 36, 0.15);
 }
 
+.menu-item-stock {
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.045);
+    padding: 0.16rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid var(--panel-border);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.menu-item-stock i {
+    color: var(--accent-primary);
+    font-size: 0.62rem;
+}
+
 .menu-item-right-wrapper {
     display: flex;
     flex-direction: column;
@@ -932,6 +1040,81 @@ label {
     background-color: rgba(210, 140, 20, 0.06);
     color: hsl(35, 85%, 55%);
     border-color: rgba(210, 140, 20, 0.1);
+}
+
+/* Modal de Foto do Cardapio */
+.photo-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.photo-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: blur(10px);
+}
+
+.photo-modal-content {
+    position: relative;
+    z-index: 1;
+    width: min(760px, 100%);
+    max-height: calc(100vh - 3rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    box-shadow: var(--shadow-lg);
+}
+
+.photo-modal-img {
+    width: 100%;
+    max-height: min(70vh, 620px);
+    object-fit: contain;
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.photo-modal-caption {
+    padding: 1rem 1.2rem;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.photo-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.58);
+    color: #fff;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.photo-modal-close:hover,
+.photo-modal-close:focus-visible {
+    background: rgba(0, 0, 0, 0.78);
+    transform: scale(1.04);
+}
+
+.body-modal-open {
+    overflow: hidden;
 }
 
 /* Seção de Resultado */
