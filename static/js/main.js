@@ -14,6 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const geminiApiKeyInput = document.getElementById('geminiApiKey');
     const btnSaveApiKey = document.getElementById('btnSaveApiKey');
     const togglePassword = document.getElementById('togglePassword');
+    const githubTokenInput = document.getElementById('githubToken');
+    const gistIdInput = document.getElementById('gistId');
+    const syncPassphraseInput = document.getElementById('syncPassphrase');
+    const toggleGithubToken = document.getElementById('toggleGithubToken');
+    const toggleSyncPassphrase = document.getElementById('toggleSyncPassphrase');
+    const btnSaveCloudSync = document.getElementById('btnSaveCloudSync');
+    const btnCloudBackup = document.getElementById('btnCloudBackup');
+    const btnCloudRestore = document.getElementById('btnCloudRestore');
+    const btnForgetCloudSync = document.getElementById('btnForgetCloudSync');
+    const cloudSyncStatus = document.getElementById('cloudSyncStatus');
+    const cloudLastSync = document.getElementById('cloudLastSync');
     const comboSelect = document.getElementById('comboSelect');
     const comboHelp = document.getElementById('comboHelp');
     const qtyMinus = document.getElementById('qtyMinus');
@@ -34,6 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const criteriaForm = document.getElementById('criteriaForm');
     const btnGerarSugestao = document.getElementById('btnGerarSugestao');
     const btnGerarSugestaoLocal = document.getElementById('btnGerarSugestaoLocal');
+    const criteriaPanel = document.querySelector('.criteria-panel');
+    const menuPanel = document.querySelector('.menu-panel');
 
     const sourceBadge = document.getElementById('sourceBadge');
     const menuSearch = document.getElementById('menuSearch');
@@ -61,6 +74,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const copyTooltip = document.getElementById('copyTooltip');
     let ultimoFocoAntesDaFoto = null;
 
+    const CLOUD_STORAGE_KEYS = {
+        token: 'qpm_github_gist_token',
+        gistId: 'qpm_github_gist_id',
+        lastSync: 'qpm_github_gist_last_sync'
+    };
+    const CLOUD_BACKUP_FILE = 'quero-pedir-marmitas.backup.enc.json';
+    const CLOUD_BACKUP_KEYS = ['theme', 'gemini_api_key', 'marmitas_criterios'];
+    const CLOUD_CRYPTO_ITERATIONS = 250000;
+
+    const alternarVisibilidadeCampo = (input, button) => {
+        if (!input || !button) return;
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+    };
+
+    const aplicarTemaSalvo = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.remove('light-theme');
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+            document.body.classList.add('light-theme');
+        }
+    };
+
+    const sincronizarAlturaCardapio = () => {
+        if (!criteriaPanel || !menuPanel) return;
+
+        const layoutDuasColunas = window.matchMedia('(min-width: 969px)').matches;
+        if (!layoutDuasColunas) {
+            menuPanel.style.height = '';
+            menuPanel.style.maxHeight = '';
+            return;
+        }
+
+        window.requestAnimationFrame(() => {
+            const alturaCriterios = Math.ceil(criteriaPanel.getBoundingClientRect().height);
+            if (alturaCriterios > 0) {
+                menuPanel.style.height = `${alturaCriterios}px`;
+                menuPanel.style.maxHeight = `${alturaCriterios}px`;
+            }
+        });
+    };
+
+    if (criteriaPanel && menuPanel) {
+        if ('ResizeObserver' in window) {
+            const criteriaResizeObserver = new ResizeObserver(sincronizarAlturaCardapio);
+            criteriaResizeObserver.observe(criteriaPanel);
+        }
+        window.addEventListener('resize', sincronizarAlturaCardapio);
+    }
+
     // 1. Controle do Tema (Claro/Escuro)
     themeToggleBtn.addEventListener('click', () => {
         document.body.classList.toggle('light-theme');
@@ -70,13 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Restaurar Tema Salvo
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.remove('light-theme');
-        document.body.classList.add('dark-theme');
-    }
+    aplicarTemaSalvo();
 
-    // 2. Expandir/Colapsar Configurações de API
+    // 2. Expandir/Colapsar Configurações Avançadas
     configHeader.addEventListener('click', () => {
         configBody.classList.toggle('collapsed');
         configChevron.classList.toggle('open');
@@ -84,12 +151,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Visualizar Senha / API Key
     togglePassword.addEventListener('click', () => {
-        const type = geminiApiKeyInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        geminiApiKeyInput.setAttribute('type', type);
-        const icon = togglePassword.querySelector('i');
-        icon.classList.toggle('fa-eye');
-        icon.classList.toggle('fa-eye-slash');
+        alternarVisibilidadeCampo(geminiApiKeyInput, togglePassword);
     });
+
+    if (toggleGithubToken) {
+        toggleGithubToken.addEventListener('click', () => {
+            alternarVisibilidadeCampo(githubTokenInput, toggleGithubToken);
+        });
+    }
+
+    if (toggleSyncPassphrase) {
+        toggleSyncPassphrase.addEventListener('click', () => {
+            alternarVisibilidadeCampo(syncPassphraseInput, toggleSyncPassphrase);
+        });
+    }
 
     // Gerenciar API Key no LocalStorage
     const carregarApiKey = () => {
@@ -113,10 +188,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (configurada) {
             dot.className = 'status-dot green';
-            text.textContent = 'Configurada';
+            text.textContent = 'IA configurada';
         } else {
             dot.className = 'status-dot red';
-            text.textContent = 'Não configurada';
+            text.textContent = 'IA pendente';
         }
     };
 
@@ -139,6 +214,377 @@ document.addEventListener('DOMContentLoaded', () => {
             mostrarAlertaFlutuante('Chave removida.', 'info');
         }
     });
+
+    const atualizarCloudSyncStatus = () => {
+        if (!cloudSyncStatus) return;
+
+        const tokenSalvo = localStorage.getItem(CLOUD_STORAGE_KEYS.token);
+        const gistIdSalvo = localStorage.getItem(CLOUD_STORAGE_KEYS.gistId);
+        const lastSync = localStorage.getItem(CLOUD_STORAGE_KEYS.lastSync);
+
+        if (tokenSalvo && gistIdSalvo) {
+            cloudSyncStatus.textContent = 'Configurado';
+            cloudSyncStatus.classList.add('configured');
+        } else if (tokenSalvo) {
+            cloudSyncStatus.textContent = 'Token salvo';
+            cloudSyncStatus.classList.add('configured');
+        } else {
+            cloudSyncStatus.textContent = 'Não configurado';
+            cloudSyncStatus.classList.remove('configured');
+        }
+
+        if (cloudLastSync) {
+            cloudLastSync.textContent = lastSync
+                ? `Última sincronização: ${new Date(lastSync).toLocaleString('pt-BR')}`
+                : 'A senha não fica salva no navegador.';
+        }
+    };
+
+    const carregarConfigCloudSync = () => {
+        if (githubTokenInput) {
+            githubTokenInput.value = localStorage.getItem(CLOUD_STORAGE_KEYS.token) || '';
+        }
+        if (gistIdInput) {
+            gistIdInput.value = localStorage.getItem(CLOUD_STORAGE_KEYS.gistId) || '';
+        }
+        atualizarCloudSyncStatus();
+    };
+
+    const salvarConfigCloudSync = (mostrarFeedback = true) => {
+        const token = githubTokenInput ? githubTokenInput.value.trim() : '';
+        const gistId = gistIdInput ? gistIdInput.value.trim() : '';
+
+        if (token) {
+            localStorage.setItem(CLOUD_STORAGE_KEYS.token, token);
+        } else {
+            localStorage.removeItem(CLOUD_STORAGE_KEYS.token);
+        }
+
+        if (gistId) {
+            localStorage.setItem(CLOUD_STORAGE_KEYS.gistId, gistId);
+        } else {
+            localStorage.removeItem(CLOUD_STORAGE_KEYS.gistId);
+        }
+
+        atualizarCloudSyncStatus();
+        if (mostrarFeedback) {
+            mostrarAlertaFlutuante('Acesso de sincronização salvo.', 'sucesso');
+        }
+    };
+
+    const validarCamposCloudSync = ({ exigirGist = false } = {}) => {
+        const token = githubTokenInput ? githubTokenInput.value.trim() : '';
+        const gistId = gistIdInput ? gistIdInput.value.trim() : '';
+        const passphrase = syncPassphraseInput ? syncPassphraseInput.value : '';
+
+        if (!token) {
+            throw new Error('Informe um token do GitHub com permissão gist.');
+        }
+        if (exigirGist && !gistId) {
+            throw new Error('Informe o Gist ID ou salve um backup na nuvem primeiro.');
+        }
+        if (!passphrase || passphrase.length < 8) {
+            throw new Error('Informe uma senha de criptografia com pelo menos 8 caracteres.');
+        }
+
+        return { token, gistId, passphrase };
+    };
+
+    const bytesToBase64 = (bytes) => {
+        let binary = '';
+        bytes.forEach(byte => {
+            binary += String.fromCharCode(byte);
+        });
+        return btoa(binary);
+    };
+
+    const base64ToBytes = (base64) => {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i += 1) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes;
+    };
+
+    const obterSubtleCrypto = () => {
+        if (!window.crypto || !window.crypto.subtle) {
+            throw new Error('Criptografia do navegador indisponível neste ambiente.');
+        }
+        return window.crypto.subtle;
+    };
+
+    const derivarChaveCloud = async (passphrase, salt, iterations) => {
+        const subtle = obterSubtleCrypto();
+        const material = await subtle.importKey(
+            'raw',
+            new TextEncoder().encode(passphrase),
+            'PBKDF2',
+            false,
+            ['deriveKey']
+        );
+
+        return subtle.deriveKey(
+            {
+                name: 'PBKDF2',
+                salt,
+                iterations,
+                hash: 'SHA-256'
+            },
+            material,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['encrypt', 'decrypt']
+        );
+    };
+
+    const montarDadosBackup = () => {
+        const dados = {};
+        CLOUD_BACKUP_KEYS.forEach(key => {
+            dados[key] = localStorage.getItem(key);
+        });
+
+        return {
+            app: 'QueroPedirMarmitas',
+            schema: 1,
+            created_at: new Date().toISOString(),
+            origin: window.location.origin,
+            data: dados
+        };
+    };
+
+    const criptografarBackup = async (dados, passphrase) => {
+        const subtle = obterSubtleCrypto();
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        const key = await derivarChaveCloud(passphrase, salt, CLOUD_CRYPTO_ITERATIONS);
+        const plaintext = new TextEncoder().encode(JSON.stringify(dados));
+        const ciphertext = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext));
+
+        return JSON.stringify({
+            app: 'QueroPedirMarmitas',
+            schema: 1,
+            encryption: 'AES-GCM',
+            kdf: 'PBKDF2-SHA-256',
+            iterations: CLOUD_CRYPTO_ITERATIONS,
+            salt: bytesToBase64(salt),
+            iv: bytesToBase64(iv),
+            ciphertext: bytesToBase64(ciphertext),
+            updated_at: new Date().toISOString()
+        }, null, 2);
+    };
+
+    const descriptografarBackup = async (conteudoCriptografado, passphrase) => {
+        const subtle = obterSubtleCrypto();
+        const envelope = JSON.parse(conteudoCriptografado);
+        if (envelope.app !== 'QueroPedirMarmitas' || !envelope.ciphertext || !envelope.salt || !envelope.iv) {
+            throw new Error('Backup criptografado inválido.');
+        }
+
+        const salt = base64ToBytes(envelope.salt);
+        const iv = base64ToBytes(envelope.iv);
+        const ciphertext = base64ToBytes(envelope.ciphertext);
+        const key = await derivarChaveCloud(passphrase, salt, envelope.iterations || CLOUD_CRYPTO_ITERATIONS);
+        const plaintext = await subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+        return JSON.parse(new TextDecoder().decode(plaintext));
+    };
+
+    const githubHeaders = (token) => ({
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'X-GitHub-Api-Version': '2022-11-28'
+    });
+
+    const lerErroGithub = async (response) => {
+        const text = await response.text();
+        try {
+            const json = JSON.parse(text);
+            return json.message || text;
+        } catch (error) {
+            return text || `HTTP ${response.status}`;
+        }
+    };
+
+    const githubRequest = async (url, options) => {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(await lerErroGithub(response));
+        }
+        return response.json();
+    };
+
+    const localizarGistBackup = async (token) => {
+        const gists = await githubRequest('https://api.github.com/gists?per_page=100', {
+            method: 'GET',
+            headers: githubHeaders(token)
+        });
+        const gist = gists.find(item => item.files && item.files[CLOUD_BACKUP_FILE]);
+        return gist ? gist.id : null;
+    };
+
+    const salvarConteudoGist = async (token, gistId, conteudo) => {
+        const body = {
+            description: 'QueroPedirMarmitas - backup criptografado',
+            files: {
+                [CLOUD_BACKUP_FILE]: {
+                    content: conteudo
+                }
+            }
+        };
+
+        if (gistId) {
+            return githubRequest(`https://api.github.com/gists/${encodeURIComponent(gistId)}`, {
+                method: 'PATCH',
+                headers: githubHeaders(token),
+                body: JSON.stringify(body)
+            });
+        }
+
+        return githubRequest('https://api.github.com/gists', {
+            method: 'POST',
+            headers: githubHeaders(token),
+            body: JSON.stringify({
+                ...body,
+                public: false
+            })
+        });
+    };
+
+    const obterConteudoGist = async (token, gistId) => {
+        const gist = await githubRequest(`https://api.github.com/gists/${encodeURIComponent(gistId)}`, {
+            method: 'GET',
+            headers: githubHeaders(token)
+        });
+        const file = gist.files ? gist.files[CLOUD_BACKUP_FILE] : null;
+        if (!file) {
+            throw new Error('Arquivo de backup não encontrado neste Gist.');
+        }
+        if (file.content) {
+            return file.content;
+        }
+        if (file.raw_url) {
+            const response = await fetch(file.raw_url);
+            if (!response.ok) {
+                throw new Error('Não foi possível baixar o conteúdo bruto do Gist.');
+            }
+            return response.text();
+        }
+        throw new Error('Conteúdo do backup indisponível no Gist.');
+    };
+
+    const aplicarDadosBackup = (backup) => {
+        if (!backup || backup.app !== 'QueroPedirMarmitas' || !backup.data) {
+            throw new Error('Backup descriptografado inválido.');
+        }
+
+        CLOUD_BACKUP_KEYS.forEach(key => {
+            const value = backup.data[key];
+            if (value === null || value === undefined) {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, String(value));
+            }
+        });
+
+        aplicarTemaSalvo();
+        carregarApiKey();
+        carregarCriterios();
+        aplicarComboSelecionado();
+        carregarCardapio();
+        sincronizarAlturaCardapio();
+    };
+
+    const setCloudButtonsLoading = (loading) => {
+        [btnSaveCloudSync, btnCloudBackup, btnCloudRestore, btnForgetCloudSync].forEach(button => {
+            if (button) button.disabled = loading;
+        });
+    };
+
+    if (btnSaveCloudSync) {
+        btnSaveCloudSync.addEventListener('click', () => {
+            salvarConfigCloudSync();
+        });
+    }
+
+    if (btnCloudBackup) {
+        btnCloudBackup.addEventListener('click', async () => {
+            try {
+                setCloudButtonsLoading(true);
+                const { token, passphrase } = validarCamposCloudSync();
+                salvarConfigCloudSync(false);
+
+                let gistId = gistIdInput ? gistIdInput.value.trim() : '';
+                if (!gistId) {
+                    gistId = await localizarGistBackup(token);
+                }
+
+                const conteudo = await criptografarBackup(montarDadosBackup(), passphrase);
+                const gist = await salvarConteudoGist(token, gistId, conteudo);
+                if (gist && gist.id) {
+                    localStorage.setItem(CLOUD_STORAGE_KEYS.gistId, gist.id);
+                    if (gistIdInput) gistIdInput.value = gist.id;
+                }
+                localStorage.setItem(CLOUD_STORAGE_KEYS.lastSync, new Date().toISOString());
+                atualizarCloudSyncStatus();
+                mostrarAlertaFlutuante('Backup criptografado salvo no Gist privado.', 'sucesso');
+            } catch (error) {
+                console.error(error);
+                mostrarAlertaFlutuante(`Falha ao salvar na nuvem: ${error.message}`, 'erro');
+            } finally {
+                setCloudButtonsLoading(false);
+            }
+        });
+    }
+
+    if (btnCloudRestore) {
+        btnCloudRestore.addEventListener('click', async () => {
+            try {
+                setCloudButtonsLoading(true);
+                const { token, passphrase } = validarCamposCloudSync();
+                salvarConfigCloudSync(false);
+
+                let gistId = gistIdInput ? gistIdInput.value.trim() : '';
+                if (!gistId) {
+                    gistId = await localizarGistBackup(token);
+                    if (!gistId) {
+                        throw new Error('Nenhum Gist de backup foi encontrado na sua conta.');
+                    }
+                    localStorage.setItem(CLOUD_STORAGE_KEYS.gistId, gistId);
+                    if (gistIdInput) gistIdInput.value = gistId;
+                }
+
+                if (!window.confirm('Restaurar o backup vai substituir as configurações locais atuais.')) {
+                    return;
+                }
+
+                const conteudo = await obterConteudoGist(token, gistId);
+                const backup = await descriptografarBackup(conteudo, passphrase);
+                aplicarDadosBackup(backup);
+                localStorage.setItem(CLOUD_STORAGE_KEYS.lastSync, new Date().toISOString());
+                atualizarCloudSyncStatus();
+                mostrarAlertaFlutuante('Configurações restauradas da nuvem.', 'sucesso');
+            } catch (error) {
+                console.error(error);
+                mostrarAlertaFlutuante(`Falha ao restaurar: ${error.message}`, 'erro');
+            } finally {
+                setCloudButtonsLoading(false);
+            }
+        });
+    }
+
+    if (btnForgetCloudSync) {
+        btnForgetCloudSync.addEventListener('click', () => {
+            localStorage.removeItem(CLOUD_STORAGE_KEYS.token);
+            localStorage.removeItem(CLOUD_STORAGE_KEYS.gistId);
+            localStorage.removeItem(CLOUD_STORAGE_KEYS.lastSync);
+            if (githubTokenInput) githubTokenInput.value = '';
+            if (gistIdInput) gistIdInput.value = '';
+            if (syncPassphraseInput) syncPassphraseInput.value = '';
+            atualizarCloudSyncStatus();
+            mostrarAlertaFlutuante('Acesso de sincronização removido deste navegador.', 'info');
+        });
+    }
 
     // Gerenciar Critérios no LocalStorage
     const montarTextoOptionCombo = (combo) => {
@@ -271,6 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultSection.classList.add('hidden');
             menuSearch.value = '';
             carregarCardapio();
+            sincronizarAlturaCardapio();
         });
     }
 
@@ -303,6 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
             quantidadeInput.value = maximo;
         }
         salvarCriterios();
+        sincronizarAlturaCardapio();
     });
 
     // Controle da Quantidade Máxima de Repetições por Marmita (+ / -)
@@ -344,6 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
             customObjetivoInput.value = '';
         }
         salvarCriterios();
+        sincronizarAlturaCardapio();
     });
 
     // Registra listeners nos campos de texto para salvar automaticamente
@@ -1128,7 +1577,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicialização
     carregarApiKey();
+    carregarConfigCloudSync();
     carregarCriterios();
     aplicarComboSelecionado();
     carregarCardapio();
+    sincronizarAlturaCardapio();
 });

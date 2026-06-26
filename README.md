@@ -1,17 +1,20 @@
 # QueroPedirMarmitas 🍽️
 
-Um assistente web local e inteligente projetado para automatizar e otimizar o pedido de combos de refeições saudáveis. O sistema lê as marmitas disponíveis em tempo real diretamente do cardápio do site de delivery, aplica seus critérios nutricionais/financeiros personalizados e utiliza a **API do Gemini (Google AI)** para escolher a melhor combinação de pratos, gerando uma mensagem perfeitamente formatada pronta para enviar ao WhatsApp de atendimento.
+Um assistente web local para escolher e montar combos de marmitas da Lulu com menos trabalho manual. O sistema lê os combos atuais do delivery em tempo real, considera preços, estoque disponível, quantidade mínima, limites de repetição e seus critérios nutricionais/financeiros para sugerir uma seleção com **Gemini** ou por uma heurística local sem IA. Depois disso, ele gera a mensagem do pedido e pode abrir o site da PrefiroDelivery com a automação do carrinho já preparada para revisão manual.
+
+Além das preferências salvas no navegador, o app também oferece backup criptografado em **GitHub Gist privado**, para restaurar configurações, critérios e chave da API depois de trocar de navegador, formatar o PC ou usar outro computador, sem depender de banco de dados.
 
 ---
 
 ## ✨ Recursos
 
-- **Raspagem em Tempo Real (Web Scraping)**: Conecta-se diretamente ao site de delivery para obter os pratos atuais, ingredientes e preços em milissegundos, sem a lentidão de navegadores headless.
+- **Raspagem em Tempo Real (Web Scraping)**: Conecta-se diretamente ao site de delivery para obter combos, pratos, ingredientes, preços e estoque disponível, sem a lentidão de navegadores headless.
 - **Seleção Dinâmica de Combo**: Busca automaticamente no site os combos disponíveis, exibe o preço "A partir de R$..." de cada um e ajusta cardápio, quantidade mínima e automação do carrinho.
 - **Mecanismo de Resiliência (Excel Fallback)**: Caso o site mude de estrutura ou esteja fora do ar, o sistema lê os pratos automaticamente a partir do arquivo Excel local no diretório do projeto.
-- **Persistência de Preferências**: Suas escolhas (objetivo, quantidade de marmitas, restrições e chave de API) ficam salvas de forma segura no navegador (*localStorage*), eliminando a necessidade de redigitá-las.
-- **Escolha Inteligente Limitada**: Permite definir um limite máximo de repetições por prato (ex: no máximo 3 unidades de cada marmita) para garantir diversidade na sua alimentação semanal.
-- **Escolha Local sem IA**: Monta uma sugestão no próprio navegador usando heurísticas por objetivo, preferências, exclusões, orçamento e limite de repetição, sem consumir tokens da API.
+- **Controle de Estoque e Disponibilidade**: Oculta pratos indisponíveis, mostra a quantidade disponível de cada prato e impede que a IA, a escolha local ou o carrinho ultrapassem o estoque atual.
+- **Persistência e Backup Criptografado**: Suas escolhas ficam salvas no navegador e podem ser sincronizadas em um GitHub Gist privado com JSON criptografado no próprio navegador.
+- **Escolha Inteligente Limitada**: Permite definir um limite máximo de repetições por prato, combinado com o estoque real, para garantir diversidade sem escolher mais unidades do que o site permite.
+- **Escolha Local sem IA**: Monta uma sugestão no próprio navegador usando heurísticas por objetivo, preferências, exclusões, orçamento, estoque e limite de repetição, sem consumir tokens da API.
 - **Saudação Dinâmica por Horário**: Ajusta a saudação automaticamente com base na hora do dia ("Bom dia!", "Boa tarde!" ou "Boa noite! Tudo bem?").
 - **Geração e Cópia Simplificada**: Remove os preços do texto a ser enviado no WhatsApp (para que o atendimento confirme os valores oficialmente) e oferece atalhos para copiar e enviar a mensagem diretamente.
 - **Montagem Assistida do Carrinho**: Gera um link para abrir o combo escolhido no site da Marmitas da Lulu com os itens selecionados e, com o userscript instalado, montar o carrinho para revisão manual.
@@ -70,6 +73,19 @@ O servidor agora rodará de forma invisível. Você pode adicionar a página `ht
 ## 🔐 Configuração da API Key
 Para utilizar o sistema, você precisará de uma chave de API do Gemini, que pode ser obtida gratuitamente no **[Google AI Studio](https://aistudio.google.com/)**.
 A chave é salva localmente e de forma segura apenas no armazenamento interno do seu próprio navegador (*localStorage*).
+
+---
+
+## ☁️ Backup Criptografado no GitHub Gist
+
+Na área **Configurações avançadas**, o bloco **Backup criptografado** permite salvar suas preferências em um Gist privado, sem banco de dados.
+
+1. Crie um token do GitHub com permissão **gist**.
+2. Informe o token no app.
+3. Informe uma senha de criptografia com pelo menos 8 caracteres.
+4. Clique em **Salvar na nuvem**.
+
+O app criptografa o JSON no navegador antes de enviar ao GitHub. A senha de criptografia não fica salva; guarde-a, porque sem ela o backup não pode ser restaurado. Depois de formatar o PC, informe um token do GitHub e a mesma senha. Se o campo **Gist ID** estiver vazio, o app tenta localizar automaticamente o backup na sua conta.
 
 ---
 

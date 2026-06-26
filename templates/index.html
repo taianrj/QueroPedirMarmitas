@@ -34,23 +34,29 @@
     </header>
 
     <main class="app-container">
-        <!-- Seção de Chave da API do Gemini -->
+        <!-- Seção de Configurações Avançadas -->
         <section class="config-section glass-panel">
             <div class="config-header" id="configHeader">
                 <div class="config-title">
-                    <i class="fa-solid fa-key"></i>
-                    <h2>Configuração da API do Gemini</h2>
+                    <i class="fa-solid fa-sliders"></i>
+                    <h2>Configurações avançadas</h2>
                 </div>
                 <div class="config-status-badge" id="apiStatusBadge">
                     <span class="status-dot red"></span>
-                    <span class="status-text">Não configurada</span>
+                    <span class="status-text">IA pendente</span>
                 </div>
                 <i class="fa-solid fa-chevron-down config-chevron" id="configChevron"></i>
             </div>
             
             <div class="config-body collapsed" id="configBody">
+                <div class="cloud-sync-header">
+                    <div class="config-title">
+                        <i class="fa-solid fa-key"></i>
+                        <h3>API do Gemini</h3>
+                    </div>
+                </div>
                 <p class="config-info">
-                    Sua chave de API do Gemini é salva localmente apenas no seu navegador (localStorage) e é enviada com segurança para as chamadas de IA.
+                    A chave do Gemini fica salva neste navegador e é usada apenas para gerar sugestões com IA.
                 </p>
                 <div class="input-group">
                     <div class="input-wrapper">
@@ -63,6 +69,66 @@
                     <button class="btn btn-primary" id="btnSaveApiKey">
                         <i class="fa-solid fa-floppy-disk"></i> Salvar
                     </button>
+                </div>
+
+                <div class="config-divider"></div>
+
+                <div class="cloud-sync-panel">
+                    <div class="cloud-sync-header">
+                        <div class="config-title">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <h3>Backup criptografado</h3>
+                        </div>
+                        <span class="cloud-sync-status" id="cloudSyncStatus">Não configurado</span>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="githubToken">Token do GitHub</label>
+                            <div class="input-wrapper">
+                                <i class="fa-brands fa-github input-icon"></i>
+                                <input type="password" id="githubToken" placeholder="Token com permissão gist" autocomplete="off">
+                                <button type="button" class="toggle-password" id="toggleGithubToken">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gistId">Gist ID</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-link input-icon"></i>
+                                <input type="text" id="gistId" placeholder="Opcional">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="syncPassphrase">Senha da criptografia</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-shield-halved input-icon"></i>
+                            <input type="password" id="syncPassphrase" placeholder="Senha para criptografar e restaurar" autocomplete="off">
+                            <button type="button" class="toggle-password" id="toggleSyncPassphrase">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="field-help" id="cloudLastSync">A senha não fica salva no navegador.</span>
+                    </div>
+
+                    <div class="cloud-sync-actions">
+                        <button type="button" class="btn btn-secondary" id="btnSaveCloudSync">
+                            <i class="fa-solid fa-floppy-disk"></i> Salvar acesso
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btnCloudBackup">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Salvar na nuvem
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btnCloudRestore">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Restaurar
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-icon-danger" id="btnForgetCloudSync" title="Esquecer acesso salvo">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>

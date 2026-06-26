@@ -297,7 +297,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
-    max-height: 500px;
+    max-height: 1100px;
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease;
 }
@@ -315,11 +315,91 @@ body {
     color: var(--text-secondary);
 }
 
+.config-divider {
+    height: 1px;
+    background: var(--panel-border);
+    margin: 0.4rem 0;
+}
+
+.cloud-sync-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.cloud-sync-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.cloud-sync-header h3 {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.cloud-sync-status {
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+    border: 1px solid var(--panel-border);
+    background: var(--input-bg);
+    padding: 0.24rem 0.7rem;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.cloud-sync-status.configured {
+    color: var(--status-green);
+    border-color: rgba(34, 166, 95, 0.28);
+    background: rgba(34, 166, 95, 0.1);
+}
+
+.cloud-sync-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    gap: 0.65rem;
+    align-items: stretch;
+}
+
+.cloud-sync-actions .btn {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.btn-icon-danger {
+    color: var(--status-red);
+}
+
+.btn-icon-danger:hover {
+    border-color: rgba(220, 70, 70, 0.42);
+    color: var(--status-red);
+}
+
+#githubToken,
+#syncPassphrase,
+#gistId {
+    padding-left: 2.6rem;
+}
+
+@media (max-width: 760px) {
+    .cloud-sync-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .cloud-sync-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
 /* Grid Principal */
 .grid-two-columns {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
     gap: 2rem;
+    align-items: start;
 }
 
 @media (max-width: 968px) {
@@ -760,7 +840,8 @@ label {
 .menu-panel {
     display: flex;
     flex-direction: column;
-    max-height: 600px;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .menu-search-bar {
@@ -795,8 +876,15 @@ label {
 
 .menu-list-container {
     flex-grow: 1;
+    min-height: 0;
     overflow-y: auto;
     padding-right: 0.3rem;
+}
+
+@media (max-width: 968px) {
+    .menu-panel {
+        max-height: 640px;
+    }
 }
 
 .menu-list-container::-webkit-scrollbar {
